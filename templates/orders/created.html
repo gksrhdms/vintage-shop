@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block title %}주문완료 · VINTAGE SHOP{% endblock %}
+
+{% block content %}
+<div style="text-align:center; padding:64px 0;">
+    <h1 style="font-weight:500; letter-spacing:-0.01em;">결제가 완료되었습니다</h1>
+    <p>주문번호 #{{ order.id }}</p>
+    <p>결제금액 {{ order.total_price|floatformat:"0g" }}원{% if order.payment_method %} · {{ order.payment_method }}{% endif %}</p>
+    <a href="{% url 'products:list' %}" class="btn" style="display:inline-block; width:auto; padding:14px 32px; text-decoration:none; margin-top:24px;">쇼핑 계속하기</a>
+</div>
+{% endblock %}

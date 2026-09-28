@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}주문하기 · VINTAGE SHOP{% endblock %}
+
+{% block content %}
+<h1 style="font-weight:500; letter-spacing:-0.01em;">주문서 작성</h1>
+
+<div style="max-width:480px;">
+    <form method="post" id="order-form" novalidate>
+        {% csrf_token %}
+        {% if form.non_field_errors %}{{ form.non_field_errors }}{% endif %}
+
+        {% for field in form %}
+            {% if field.name == 'postcode' %}
+                {# 배송지: 우편번호/기본 주소는 주소 검색으로만 채우고, 상세 주소는 직접 입력 #}
+                <fieldset class="address-fieldset">
+                    <legend>배송지</legend>
+                    <div class="postcode-row">
+                        <label for="{{ form.postcode.id_for_label }}" class="visually-hidden">우편번호</label>
+                        {{ form.postcode }}
+                        <button type="button" class="btn btn-outline address-search-btn" id="address-search-btn">주소 검색</button>
+                    </div>
+                    <label for="{{ form.address.id_for_label }}" class="visually-hidden">기본 주소</label>
+                    {{ form.address }}
+                    <label for="{{ form.address_detail.id_for_label }}" class="visually-hidden">상세 주소</label>
+                    {{ form.address_detail }}
+                    {{ form.postcode.errors }}{{ form.address.errors }}{{ form.address_detail.errors }}
+                    <p class="address-message" id="address-message" role="alert" hidden></p>
+                </fieldset>
+            {% elif field.name != 'address' and field.name != 'address_detail' %}
+                <p>
+                    {{ field.label_tag }}
+                    {{ field }}
+                    {{ field.errors }}
+                </p>
+            {% endif %}
+        {% endfor %}
+
+        <p><strong>총 결제금액: {{ cart.get_total_price|floatformat:"0g" }}원</strong></p>
+        <button type="submit" class="btn">결제하기</button>
+    </form>
+</div>
+
+{# 카카오(다음) 우편번호 검색 창이 뜨는 레이어 #}
+<div class="postcode-layer" id="postcode-layer" hidden>
+    <div class="postcode-dialog" role="dialog" aria-modal="true" aria-labelledby="postcode-title">
+        <div class="postcode-head">
+            <strong id="postcode-title">주소 검색</strong>
+            <button type="button" class="postcode-close" id="postcode-close" aria-label="주소 검색 닫기">닫기</button>
+        </div>
+        <div class="postcode-embed" id="postcode-embed"></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{# 카카오 우편번호 서비스: 키 발급 없이 상업적 용도까지 무료 (https://postcode.map.kakao.com/guide) #}
+<script src="https://t1.kakaocdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+<script src="{% static 'js/address.js' %}"></script>
+{% endblock %}

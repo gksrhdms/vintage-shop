@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% block title %}회원가입 · VINTAGE SHOP{% endblock %}
+
+{% block content %}
+<h1 style="font-weight:500; letter-spacing:-0.01em;">SIGN UP</h1>
+<div style="max-width:360px;">
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn">가입하기</button>
+    </form>
+</div>
+{% endblock %}

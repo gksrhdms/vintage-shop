@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+db.sqlite3
+media/
+.env
+venv/
+.vscode/
+staticfiles/
+# 파일 없이 빈 git 저장소만 있는 예전 폴더 (별도 저장소라 제외)
+vintage-shop/

@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block title %}{{ post.title }} · VINTAGE SHOP{% endblock %}
+{% block main_class %}is-journal is-split{% endblock %}
+{% block footer %}{% endblock %}
+
+{% block content %}
+{# 참고: mainaccessdoor.com — 왼쪽 이미지 칸은 화면 높이를 꽉 채우고, 두 칸이 스크롤바 없이 각자 스크롤됨 #}
+<article class="journal-post split">
+    <div class="split-col split-media-col" tabindex="0" aria-label="이미지">
+        {% for item in post.images.all %}
+            <figure class="split-media">
+                <img src="{{ item.image.url }}" alt="{{ post.title }} 사진 {{ forloop.counter }}"{% if not forloop.first %} loading="lazy"{% endif %} decoding="async">
+            </figure>
+        {% endfor %}
+    </div>
+
+    <div class="split-col split-text-col" tabindex="0" aria-label="글">
+        <header class="split-head">
+            <h1>{{ post.title }}</h1>
+            <p class="brand">{{ post.created_at|date:"Y.m.d" }}</p>
+        </header>
+        {% if post.content %}
+            {# 빈 줄로 나눈 부분은 문단(<p>), 한 줄 바꿈은 <br>로 표시 #}
+            <div class="journal-body">{{ post.content|linebreaks }}</div>
+        {% endif %}
+        {% include '_footer.html' %}
+    </div>
+</article>
+{% endblock %}

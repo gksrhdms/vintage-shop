@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% block title %}{{ product.name }} · VINTAGE SHOP{% endblock %}
+
+{% block content %}
+<div class="work-layout">
+    {# 글 섹션: 브랜드/이름/가격/실측 등 텍스트 정보만 모아, 사진을 스크롤하는 동안 고정 #}
+    <div class="work-text">
+        <div class="brand">{{ product.brand|upper }}</div>
+        <h1>{{ product.name }}</h1>
+        <div class="price">{{ product.price|floatformat:"0g" }}원</div>
+
+        <dl>
+            <dt>사이즈</dt><dd>{{ product.size|default:"-" }}</dd>
+            {% if product.measurements %}
+                <dt>실측</dt><dd style="white-space:pre-line;">{{ product.measurements }}</dd>
+            {% endif %}
+        </dl>
+
+        <p style="white-space:pre-line; margin-top:24px;">{{ product.description }}</p>
+
+        {% if product.is_sold %}
+            <button class="btn disabled" disabled>SOLD OUT</button>
+        {% else %}
+            <form action="{% url 'cart:add' product.id %}" method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn">장바구니에 담기</button>
+            </form>
+        {% endif %}
+    </div>
+
+    {# 사진 섹션: 이미지 한 장마다 자신만의 섹션을 가지고 세로로 이어짐 #}
+    <div class="work-images">
+        {% for img in product.images.all %}
+            <div class="work-image-section">
+                <img src="{{ img.image.url }}" alt="{{ product.name }}">
+            </div>
+        {% empty %}
+            <div class="work-image-section">
+                <div class="work-image-placeholder"></div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

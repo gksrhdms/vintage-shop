@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% block title %}결제하기 · VINTAGE SHOP{% endblock %}
+
+{% block content %}
+<h1 style="font-weight:500; letter-spacing:-0.01em;">결제하기</h1>
+
+<div style="max-width:560px;">
+    <p>{{ toss.orderName }}</p>
+    <p><strong>총 결제금액: {{ order.total_price|floatformat:"0g" }}원</strong></p>
+
+    <!-- 토스페이먼츠 결제위젯이 그려지는 영역 -->
+    <div id="payment-method"></div>
+    <div id="agreement"></div>
+
+    <button type="button" id="payment-button" class="btn" disabled>결제하기</button>
+</div>
+
+{{ toss|json_script:"toss-data" }}
+<script src="https://js.tosspayments.com/v2/standard"></script>
+<script>
+(async function () {
+    const data = JSON.parse(document.getElementById('toss-data').textContent);
+    const button = document.getElementById('payment-button');
+
+    const tossPayments = TossPayments(data.clientKey);
+    const widgets = tossPayments.widgets({ customerKey: TossPayments.ANONYMOUS });
+
+    await widgets.setAmount({ currency: 'KRW', value: data.amount });
+    await Promise.all([
+        widgets.renderPaymentMethods({ selector: '#payment-method', variantKey: 'DEFAULT' }),
+        widgets.renderAgreement({ selector: '#agreement', variantKey: 'AGREEMENT' }),
+    ]);
+    button.disabled = false;
+
+    button.addEventListener('click', async function () {
+        // 결제 인증이 끝나면 successUrl로 이동하고, 서버(payment_success)에서 최종 승인합니다.
+        await widgets.requestPayment({
+            orderId: data.orderId,
+            orderName: data.orderName,
+            customerName: data.customerName,
+            successUrl: data.successUrl,
+            failUrl: data.failUrl,
+        });
+    });
+})();
+</script>
+{% endblock %}

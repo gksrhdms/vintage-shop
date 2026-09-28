@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block title %}{{ page.title|default:"ABOUT" }} · VINTAGE SHOP{% endblock %}
+{% block main_class %}is-split{% endblock %}
+{% block footer %}{% endblock %}
+
+{% block content %}
+{# 내용은 관리자(/admin/ > About 페이지)에서 수정. 왼쪽 이미지 칸은 화면 높이를 꽉 채우고, 두 칸이 각자 스크롤됨 #}
+<article class="journal-post split">
+    <div class="split-col split-media-col" tabindex="0" aria-label="이미지">
+        {% if page.image %}
+            <figure class="split-media"><img src="{{ page.image.url }}" alt="{{ page.title }}" decoding="async"></figure>
+        {% endif %}
+    </div>
+    <div class="split-col split-text-col" tabindex="0" aria-label="글">
+        <header class="split-head"><h1>{{ page.title|default:"ABOUT" }}</h1></header>
+        <div class="about-body">{{ page.content|default:"준비 중입니다." }}</div>
+        {% include '_footer.html' %}
+    </div>
+</article>
+{% endblock %}

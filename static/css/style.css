@@ -1,0 +1,670 @@
+/* 레퍼런스: garb.kr(좌측 사이드바 · 카테고리 바 · 가운데 정렬 캡션) + nhogirl.com(소문자 메뉴 · 가벼운 톤 · 하늘색/빨강 포인트)
+   폰트: 영문 JetBrains Mono + 한글 D2Coding ligature(fonts.css) — 둘 다 SIL OFL 1.1
+   JetBrains Mono에는 한글이 없고, D2Coding 파일에는 한글만 있어서 글자 종류별로 자동으로 나뉘어 표시됨 */
+
+:root {
+    --black: #111111;
+    --gray: #757575;
+    --line: #e5e5e5;
+    --bg: #ffffff;
+    --accent: #32a3d5;   /* 상태 표시 포인트 (배송중) */
+    --hover: #9a9a9a;    /* 메뉴/링크에 마우스를 올렸을 때: 은은한 회색 */
+    --sold: #dd2f2d;     /* SOLD OUT 표시 */
+    --sidebar-width: 220px;
+    --font: 'JetBrains Mono', 'D2Coding ligature', ui-monospace, SFMono-Regular, Menlo, Consolas, 'Apple SD Gothic Neo', 'Malgun Gothic', monospace;
+    --font-journal: 'JetBrains Mono', 'D2Coding ligature Journal', ui-monospace, SFMono-Regular, Menlo, Consolas, 'Apple SD Gothic Neo', 'Malgun Gothic', monospace;
+}
+
+* { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    color: var(--black);
+    background: var(--bg);
+    font-family: var(--font);
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+    transition: color 0.12s ease;
+}
+
+a:hover { color: var(--hover); }
+
+h1 {
+    font-size: 18px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    margin: 0 0 24px;
+}
+
+/* ---------- Layout: 좌측 사이드바 + 본문 ---------- */
+.layout {
+    display: flex;
+    align-items: flex-start;
+    min-height: 100vh;
+}
+
+.sidebar {
+    position: sticky;
+    top: 0;
+    flex: 0 0 var(--sidebar-width);
+    width: var(--sidebar-width);
+    height: 100vh;
+    padding: 32px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 36px;
+}
+
+.logo {
+    display: block;
+    font-size: 24px;
+    line-height: 1;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+}
+
+.logo:hover { color: var(--black); }
+
+/* 메인 메뉴/계정 메뉴: 소문자 세로 목록, 현재 페이지만 밑줄 */
+.side-nav {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+    font-size: 14px;
+}
+
+.side-nav a,
+.link-button {
+    text-transform: lowercase;
+}
+
+.side-nav .is-active {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    text-decoration-thickness: 1px;
+}
+
+/* 로그아웃처럼 폼 버튼이지만 링크처럼 보여야 하는 요소 */
+.side-nav form { margin: 0; }
+.link-button {
+    padding: 0;
+    border: 0;
+    background: none;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+}
+.link-button:hover { color: var(--hover); }
+
+.content {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* ---------- Messages ---------- */
+.messages {
+    list-style: none;
+    margin: 0;
+    padding: 12px 24px;
+    background: #f7f7f7;
+    font-size: 13px;
+}
+
+/* ---------- Main ---------- */
+.site-main {
+    flex: 1;
+    width: 100%;
+    max-width: 1180px;
+    padding: 40px 48px 96px;
+}
+
+/* ---------- 카테고리 바 (상품 목록 맨 위 가로 한 줄) ---------- */
+.category-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 28px;
+    margin: 0 0 40px;
+    font-size: 13px;
+    letter-spacing: 0.02em;
+}
+
+.category-bar .is-active {
+    font-weight: 600;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+    text-decoration-thickness: 1px;
+}
+
+/* ---------- 상품 그리드 ---------- */
+.product-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr)); /* minmax(0,…): 큰 사진이 칸을 넓혀 화면 밖으로 넘치지 않게 */
+    gap: 56px 40px;
+}
+
+/* 홈: 글씨 없이 사진만 → 사진 사이 간격을 좁게 */
+.product-grid.is-images-only { gap: 32px; }
+.product-grid.is-images-only .thumb { margin-bottom: 0; }
+
+.product-card { display: block; }
+.product-card:hover { color: inherit; }
+
+.product-card .thumb {
+    aspect-ratio: 3 / 4;
+    background: #f2f2f2;
+    overflow: hidden;
+    margin-bottom: 14px;
+}
+
+.product-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: opacity 0.2s ease;
+}
+
+.product-card:hover img { opacity: 0.85; }
+
+/* 캡션: 브랜드 / 상품명 / 가격을 가운데 정렬로 쌓음 */
+.product-card .caption {
+    text-align: center;
+    font-size: 13px;
+    line-height: 1.45;
+}
+
+.product-card .brand { font-weight: 500; }
+.product-card .name { color: var(--black); }
+.product-card .price { margin-top: 4px; font-size: 12px; color: var(--gray); }
+.product-card .sold-badge { font-size: 12px; color: var(--sold); }
+
+.pagination {
+    margin-top: 64px;
+    text-align: center;
+    font-size: 13px;
+}
+
+/* ---------- Detail (텍스트/사진이 각자의 섹션을 가지는 워크 레이아웃) ---------- */
+.work-layout {
+    display: flex;
+    align-items: flex-start;
+    gap: 64px;
+}
+
+/* 글 섹션: 스크롤해도 화면에 고정되는 텍스트 컬럼 */
+.work-text {
+    position: sticky;
+    top: 40px;
+    width: 300px;
+    flex-shrink: 0;
+    font-size: 13px;
+}
+
+.work-text .brand { font-size: 12px; font-weight: 500; }
+
+.work-text h1 {
+    font-size: 18px;
+    margin: 2px 0 4px;
+}
+
+.work-text .price { font-size: 14px; margin: 12px 0; }
+
+.work-text dl {
+    display: grid;
+    grid-template-columns: 80px 1fr;
+    row-gap: 8px;
+    padding-top: 16px;
+    margin: 16px 0 0;
+    border-top: 1px solid var(--line);
+}
+
+.work-text dt { color: var(--gray); }
+.work-text dd { margin: 0; }
+
+/* 사진 섹션: 이미지 한 장 = 섹션 하나, 세로로 이어서 쌓임 */
+.work-images {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.work-image-section img {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+.work-image-placeholder {
+    aspect-ratio: 3 / 4;
+    background: #f2f2f2;
+}
+
+/* ---------- Buttons ---------- */
+.btn {
+    display: inline-block;
+    width: 100%;
+    padding: 14px;
+    text-align: center;
+    border: 1px solid var(--black);
+    background: var(--black);
+    color: #fff;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    margin-top: 24px;
+}
+
+a.btn:hover { color: #fff; }
+
+.btn:disabled, .btn.disabled {
+    background: #ccc;
+    border-color: #ccc;
+    cursor: not-allowed;
+}
+
+.btn-outline {
+    background: transparent;
+    color: var(--black);
+}
+
+/* ---------- Cart / Orders ---------- */
+.cart-table { width: 100%; border-collapse: collapse; margin-bottom: 24px; }
+.cart-table th, .cart-table td {
+    border-bottom: 1px solid var(--line);
+    padding: 12px 8px;
+    text-align: left;
+    font-weight: 400;
+    font-size: 13px;
+}
+.cart-table th { color: var(--gray); }
+.cart-total { text-align: right; font-size: 16px; font-weight: 600; margin: 24px 0; }
+
+form p { margin: 0 0 14px; }
+form label { display: block; margin-bottom: 6px; font-size: 12px; color: var(--gray); }
+form input, form textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid var(--line);
+    border-radius: 0;
+    font-family: inherit;
+    font-size: 14px;
+}
+form input:focus, form textarea:focus { outline: 1px solid var(--black); outline-offset: -1px; }
+
+.visually-hidden {
+    position: absolute !important;
+    width: 1px; height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+}
+
+/* ---------- 주문서 배송지 (우편번호 / 기본 주소 / 상세 주소) ---------- */
+.address-fieldset { margin: 0 0 14px; padding: 0; border: 0; }
+.address-fieldset legend { margin-bottom: 6px; padding: 0; font-size: 12px; color: var(--gray); }
+.address-fieldset input,
+.address-fieldset textarea { display: block; margin-bottom: 8px; }
+.address-fieldset [readonly] { background: #f7f7f7; cursor: pointer; }
+.address-fieldset .address-base { resize: none; overflow: hidden; line-height: 1.5; }
+.postcode-row { display: flex; gap: 8px; }
+.postcode-row input { flex: 1; min-width: 0; }
+.address-search-btn { width: auto; margin: 0 0 8px; padding: 10px 16px; white-space: nowrap; }
+.address-message, .errorlist { margin: 0 0 8px; padding: 0; list-style: none; font-size: 12px; color: var(--sold); }
+
+/* 주소 검색 레이어: PC는 가운데 창, 모바일은 화면 전체 */
+.postcode-layer {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(17, 17, 17, 0.35);
+}
+.postcode-layer[hidden] { display: none; }
+.postcode-dialog {
+    display: flex;
+    flex-direction: column;
+    width: min(500px, 100% - 32px);
+    height: min(600px, 100% - 64px);
+    background: var(--bg);
+}
+.postcode-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--line);
+    font-size: 14px;
+}
+.postcode-close { padding: 4px 0; border: 0; background: none; font: inherit; text-decoration: underline; cursor: pointer; }
+.postcode-embed { flex: 1; min-height: 0; }
+html.postcode-open, html.postcode-open body { overflow: hidden; }
+
+/* ---------- 마이페이지 (주문내역 / 주문 상세 / 배송조회) ---------- */
+.mypage { max-width: 640px; }
+.mypage-hello, .mypage-empty, .mypage-note { font-size: 13px; color: var(--gray); margin: -12px 0 28px; }
+.mypage-note { margin: 0 0 12px; }
+.mypage-empty a, .mypage-back a { text-decoration: underline; text-underline-offset: 3px; }
+.mypage-back { margin: 0 0 16px; font-size: 13px; }
+
+.order-list { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
+.order-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--line);
+}
+.order-link { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.order-link:hover .order-name { color: var(--hover); }
+.order-meta { font-size: 12px; color: var(--gray); }
+.order-name { font-size: 14px; }
+.order-sum { font-size: 13px; }
+.order-status { font-weight: 500; }
+.status-shipped { color: var(--accent); }
+.status-canceled { color: var(--sold); }
+.btn.order-track { width: auto; margin: 0; padding: 8px 14px; font-size: 12px; white-space: nowrap; }
+a.btn.btn-outline:hover { color: var(--black); background: #f7f7f7; }
+
+.mypage-section { padding: 20px 0; border-top: 1px solid var(--line); }
+.mypage-section h2 { margin: 0 0 12px; font-size: 13px; font-weight: 500; color: var(--gray); }
+.mypage-section .order-status { margin: 0 0 8px; font-size: 16px; }
+.mypage-section .order-track { margin-top: 12px; }
+.mypage-dl { display: grid; grid-template-columns: 80px 1fr; gap: 6px 12px; margin: 0; font-size: 13px; }
+.mypage-dl dt { color: var(--gray); }
+.mypage-dl dd { margin: 0; overflow-wrap: anywhere; }
+.mypage-items { list-style: none; margin: 0; padding: 0; font-size: 13px; }
+.mypage-items li { display: flex; justify-content: space-between; gap: 12px; padding: 4px 0; }
+
+/* ---------- Journal / About ---------- */
+.journal-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 48px 40px; }
+.journal-list a:hover { color: inherit; }
+.journal-list .name { margin-top: 4px; font-size: 13px; font-weight: 500; }
+.journal-list .brand { font-size: 12px; color: var(--gray); }
+
+/* 목록: 사진 비율이 제각각이어도 카드 크기가 같도록 4:3 칸에 맞춰 잘라서 표시 */
+.journal-list .thumb {
+    aspect-ratio: 4 / 3;
+    background: #f2f2f2;
+    overflow: hidden;
+    margin-bottom: 10px;
+}
+.journal-list .thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.journal-post .brand { font-size: 12px; color: var(--gray); }
+
+/* ---------- About / Journal 상세: 이미지는 왼쪽, 글은 오른쪽 (참고: mainaccessdoor.com)
+   PC: 두 칸이 화면 높이를 꽉 채우고, 스크롤바 없이 각자 스크롤됨(박스처럼 보이지 않게).
+   페이지 자체는 스크롤되지 않고, 푸터는 글 칸 맨 끝에 들어감 ---------- */
+.site-main.is-split { max-width: none; padding: 0; }
+.split {
+    display: grid;
+    grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+    column-gap: 48px;
+    height: 100vh;
+    height: 100dvh;
+}
+.split-col {
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;  /* 칸 끝까지 스크롤해도 다른 곳이 같이 움직이지 않게 */
+    scrollbar-width: none;         /* 스크롤바 숨김 (Firefox) */
+    outline: none;
+}
+.split-col::-webkit-scrollbar { display: none; }  /* 스크롤바 숨김 (Chrome/Safari) */
+.split-col:focus-visible { box-shadow: inset 0 0 0 1px var(--line); }
+.split-media-col { display: flex; flex-direction: column; gap: 12px; padding-block: 32px; }
+.split-text-col { display: flex; flex-direction: column; max-width: 520px; padding: 32px 48px 0 0; }
+.split-media { margin: 0; }
+.split-media img { display: block; width: 100%; height: auto; }
+.split-head h1 { margin: 0 0 8px; }
+.split-head .brand { margin: 0 0 28px; }
+.about-body { white-space: pre-line; }
+.split-text-col .site-footer { margin-top: auto; padding: 64px 0 32px; }
+
+/* ---------- Journal 페이지 전용 (목록/상세) ----------
+   본문은 About과 같은 Regular·14px, 글 제목만 한글 D2Coding Bold(영문 JetBrains Mono 굵기는 그대로).
+   About 페이지도 .journal-post 모양을 쓰므로 반드시 .is-journal 아래로 한정 */
+.is-journal .journal-list .name,
+.is-journal .journal-post h1 { font-family: var(--font-journal); }
+
+.is-journal .journal-title { font-size: 24px; line-height: 1.35; margin-bottom: 36px; }
+
+.is-journal .journal-list { gap: 56px 40px; }
+.is-journal .journal-list .thumb { margin-bottom: 16px; }
+.is-journal .journal-list .name { margin-top: 0; font-size: 18px; line-height: 1.5; }
+.is-journal .journal-list .brand { margin-top: 4px; font-size: 14px; }
+
+.is-journal .journal-post h1 { font-size: 28px; line-height: 1.35; margin-bottom: 8px; }
+.is-journal .journal-post .brand { margin: 0 0 28px; font-size: 14px; }
+/* 본문: About 본문과 같은 크기/줄 간격(14px, 1.6), 문단 사이는 About처럼 빈 줄 하나 높이 */
+.is-journal .journal-body { font-size: 14px; line-height: 1.6; word-break: keep-all; overflow-wrap: anywhere; }
+.is-journal .journal-body p { margin: 0 0 1.6em; }
+.is-journal .journal-body p:last-child { margin-bottom: 0; }
+
+/* ---------- Footer ---------- */
+.site-footer {
+    padding: 32px 48px;
+    font-size: 12px;
+    color: var(--gray);
+}
+.site-footer p { margin: 0; }
+.footer-note { margin-top: 4px; }
+
+/* ---------- 모바일 헤더/메뉴 (760px 이하에서만 보임) ---------- */
+.mobile-header,
+.menu-backdrop { display: none; }
+
+.menu-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;   /* 손가락으로 누르기 쉬운 크기 */
+    height: 44px;
+    margin-right: -12px;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--black);
+    cursor: pointer;
+}
+
+/* 두 줄 아이콘 → 열리면 X로 바뀜 */
+.menu-icon { position: relative; display: block; width: 20px; height: 10px; }
+.menu-icon span {
+    position: absolute;
+    left: 0;
+    width: 100%;
+    height: 1.5px;
+    background: currentColor;
+    transition: transform 0.28s ease, top 0.28s ease;
+}
+.menu-icon span:first-child { top: 0; }
+.menu-icon span:last-child { top: calc(100% - 1.5px); }
+.menu-open .menu-icon span:first-child { top: calc(50% - 0.75px); transform: rotate(45deg); }
+.menu-open .menu-icon span:last-child { top: calc(50% - 0.75px); transform: rotate(-45deg); }
+
+/* ---------- Responsive ---------- */
+@media (max-width: 1100px) {
+    .product-grid { gap: 48px 24px; }
+    .work-layout { gap: 40px; }
+    .work-text { width: 260px; }
+}
+
+/* 좁은 화면(1000px 이하): 따로 스크롤 없이 페이지 하나로 이어짐.
+   두 칸을 풀어(display: contents) 각 요소의 order 값대로 제목 → 이미지 → 글(블록 순서) 배치 */
+/* 좁은 화면(1000px 이하): 두 칸 스크롤 없이 페이지 하나로 이어짐. 제목 → 글 → 이미지 → 푸터 순서 */
+@media (max-width: 1000px) {
+    .site-main.is-split { padding: 40px 48px 0; }
+    .split { display: flex; flex-direction: column; gap: 20px; height: auto; }
+    .split-col { display: contents; }
+    .split-head { order: -3; }
+    .split-head .brand { margin-bottom: 0; }
+    .journal-body, .about-body { order: -2; margin-bottom: 16px; }
+    .split > .split-col > * { max-width: 640px; width: 100%; }
+    .split-text-col .site-footer { order: 10; margin-top: 40px; padding: 24px 0; }
+}
+
+/* 모바일/태블릿(760px 이하): 상단 고정 헤더 + 메뉴 버튼으로 여닫는 메뉴 패널 */
+@media (max-width: 760px) {
+    :root { --mobile-header-height: 52px; }
+
+    /* 헤더는 화면 상단에 고정(fixed), 본문은 헤더 높이만큼 아래에서 시작 */
+    body { padding-top: var(--mobile-header-height); }
+
+    .mobile-header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 50;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: var(--mobile-header-height);
+        padding: 0 16px;
+        background: var(--bg);
+        border-bottom: 1px solid var(--line);
+    }
+
+    .mobile-logo {
+        font-size: 15px;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+    }
+    .mobile-logo:hover { color: var(--black); }
+
+    .layout { flex-direction: column; align-items: stretch; min-height: 0; }
+
+    /* 사이드바 → 헤더 아래로 내려오는 메뉴 패널 (닫혀 있을 땐 숨김, 스크린리더/탭 이동에서도 제외) */
+    .sidebar {
+        position: fixed;
+        top: var(--mobile-header-height);
+        left: 0;
+        right: 0;
+        z-index: 40;
+        width: auto;
+        height: auto;
+        max-height: calc(100dvh - var(--mobile-header-height));
+        overflow-y: auto;
+        flex: none;
+        padding: 24px 16px 32px;
+        gap: 24px;
+        background: var(--bg);
+        border-bottom: 1px solid var(--line);
+        visibility: hidden;
+        opacity: 0;
+        transform: translateY(-8px);
+        transition: opacity 0.28s ease, transform 0.28s ease, visibility 0s linear 0.28s;
+    }
+    .menu-open .sidebar {
+        visibility: visible;
+        opacity: 1;
+        transform: none;
+        transition: opacity 0.28s ease, transform 0.28s ease, visibility 0s;
+    }
+
+    .sidebar .logo { display: none; }  /* 로고는 헤더에 있음 */
+    .side-nav { gap: 6px; font-size: 16px; }
+
+    /* 메뉴 항목이 살짝 시간차를 두고 나타남 */
+    .sidebar .side-nav > * {
+        opacity: 0;
+        transform: translateY(-4px);
+        transition: opacity 0.24s ease, transform 0.24s ease;
+    }
+    .menu-open .sidebar .side-nav > * { opacity: 1; transform: none; }
+    .menu-open .sidebar .side-nav:not(.side-nav-account) > :nth-child(1) { transition-delay: 0.04s; }
+    .menu-open .sidebar .side-nav:not(.side-nav-account) > :nth-child(2) { transition-delay: 0.07s; }
+    .menu-open .sidebar .side-nav:not(.side-nav-account) > :nth-child(3) { transition-delay: 0.10s; }
+    .menu-open .sidebar .side-nav-account > :nth-child(1) { transition-delay: 0.13s; }
+    .menu-open .sidebar .side-nav-account > :nth-child(2) { transition-delay: 0.16s; }
+    .menu-open .sidebar .side-nav-account > :nth-child(3) { transition-delay: 0.19s; }
+
+    /* 메뉴 바깥 영역: 누르면 닫힘 */
+    .menu-backdrop {
+        display: block;
+        position: fixed;
+        inset: var(--mobile-header-height) 0 0 0;
+        z-index: 30;
+        background: rgba(17, 17, 17, 0.18);
+        visibility: hidden;
+        opacity: 0;
+        transition: opacity 0.28s ease, visibility 0s linear 0.28s;
+    }
+    .menu-open .menu-backdrop {
+        visibility: visible;
+        opacity: 1;
+        transition: opacity 0.28s ease, visibility 0s;
+    }
+
+    /* 주소 검색 창은 화면 전체를 사용 */
+    .postcode-dialog { width: 100%; height: 100%; height: 100dvh; }
+
+    /* 메뉴가 열려 있는 동안 뒤쪽 페이지 스크롤 잠금 (본문 고정은 menu.js에서 처리) */
+    html.menu-open { overflow: hidden; overscroll-behavior: none; }
+
+    .site-main { padding: 24px 16px 72px; }
+    .site-main.is-split { padding: 24px 16px 0; }
+    .site-footer { padding: 24px 16px; }
+
+    /* 카테고리 바가 화면을 넘치면 줄바꿈 대신 가로 스크롤 */
+    .category-bar {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        white-space: nowrap;
+        gap: 22px;
+        margin: 0 -16px 28px;
+        padding: 0 16px 6px;
+        scrollbar-width: none;
+    }
+    .category-bar::-webkit-scrollbar { display: none; }
+
+    .product-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 36px 12px; }
+    .product-grid.is-images-only { gap: 12px; }
+    .product-card .caption { font-size: 12px; }
+
+    .work-layout { flex-direction: column; gap: 28px; }
+    .work-text { position: static; width: 100%; }
+    .work-images { gap: 12px; }
+
+    .journal-list { grid-template-columns: 1fr; gap: 36px; }
+
+    .is-journal .journal-title { font-size: 21px; margin-bottom: 28px; }
+    .is-journal .journal-list { gap: 44px; }
+    .is-journal .journal-list .name { font-size: 17px; }
+    .is-journal .journal-post h1 { font-size: 23px; }
+    .is-journal .journal-post .brand { margin-bottom: 22px; }
+}
+
+/* '동작 줄이기' 설정 사용자: 움직임 없이 바로 나타나고 사라짐 */
+@media (prefers-reduced-motion: reduce) {
+    .sidebar,
+    .sidebar .side-nav > *,
+    .menu-backdrop,
+    .menu-icon span {
+        transition-duration: 0.01ms !important;
+        transition-delay: 0s !important;
+    }
+    .sidebar,
+    .sidebar .side-nav > * { transform: none !important; }
+}

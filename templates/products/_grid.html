@@ -1,0 +1,30 @@
+{# 상품 그리드 + 페이지 이동. 홈/Shop/카테고리/NEW(products/list.html)에서 사용 #}
+<div class="product-grid{% if not show_caption %} is-images-only{% endif %}">
+    {% for product in page_obj %}
+        <a href="{{ product.get_absolute_url }}" class="product-card">
+            <div class="thumb">
+                {% with product.images.first as img %}
+                    {% if img %}<img src="{{ img.image.url }}" alt="{{ product.name }}">{% endif %}
+                {% endwith %}
+            </div>
+            {% if show_caption %}
+            <div class="caption">
+                {% if product.brand %}<div class="brand">{{ product.brand }}</div>{% endif %}
+                <div class="name">{{ product.name }}</div>
+                <div class="price">{{ product.price|floatformat:"0g" }}원</div>
+                {% if product.is_sold %}<div class="sold-badge">sold out</div>{% endif %}
+            </div>
+            {% endif %}
+        </a>
+    {% empty %}
+        <p>등록된 상품이 없습니다.</p>
+    {% endfor %}
+</div>
+
+{% if page_obj.has_other_pages %}
+<div class="pagination">
+    {% if page_obj.has_previous %}<a href="?page={{ page_obj.previous_page_number }}">이전</a>&nbsp;&nbsp;{% endif %}
+    <span>{{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
+    {% if page_obj.has_next %}&nbsp;&nbsp;<a href="?page={{ page_obj.next_page_number }}">다음</a>{% endif %}
+</div>
+{% endif %}

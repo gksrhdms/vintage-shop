@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% block title %}주문 #{{ order.id }} · VINTAGE SHOP{% endblock %}
+
+{% block content %}
+<div class="mypage">
+    <p class="mypage-back"><a href="{% url 'accounts:mypage' %}">← 주문내역</a></p>
+    <h1>주문 #{{ order.id }}</h1>
+
+    <section class="mypage-section">
+        <h2>배송 상태</h2>
+        <p class="order-status status-{{ order.status|lower }}">{{ order.get_status_display }}</p>
+        {% if order.status == 'PAID' %}
+            <p class="mypage-note">결제가 완료되어 상품을 준비하고 있어요. 발송되면 송장번호가 표시돼요.</p>
+        {% elif order.status == 'CANCELED' %}
+            <p class="mypage-note">취소된 주문이에요.</p>
+        {% endif %}
+        {% if order.tracking_number %}
+            <dl class="mypage-dl">
+                <dt>택배사</dt><dd>{{ order.get_courier_display|default:"-" }}</dd>
+                <dt>송장번호</dt><dd>{{ order.tracking_number }}</dd>
+            </dl>
+            {% if order.tracking_url %}
+                <a href="{{ order.tracking_url }}" class="btn btn-outline order-track" target="_blank" rel="noopener">배송조회</a>
+            {% endif %}
+        {% endif %}
+    </section>
+
+    <section class="mypage-section">
+        <h2>주문 상품</h2>
+        <ul class="mypage-items">
+            {% for item in order.items.all %}
+                <li>
+                    {% if item.product %}<a href="{{ item.product.get_absolute_url }}">{{ item.product.name }}</a>{% else %}(삭제된 상품){% endif %}
+                    <span>{{ item.price|floatformat:"0g" }}원</span>
+                </li>
+            {% endfor %}
+        </ul>
+    </section>
+
+    <section class="mypage-section">
+        <h2>결제 정보</h2>
+        <dl class="mypage-dl">
+            <dt>주문일</dt><dd>{{ order.created_at|date:"Y.m.d H:i" }}</dd>
+            <dt>결제금액</dt><dd>{{ order.total_price|floatformat:"0g" }}원</dd>
+            <dt>결제수단</dt><dd>{{ order.payment_method|default:"-" }}</dd>
+            <dt>결제일시</dt><dd>{{ order.paid_at|date:"Y.m.d H:i"|default:"-" }}</dd>
+        </dl>
+    </section>
+
+    <section class="mypage-section">
+        <h2>배송지</h2>
+        <dl class="mypage-dl">
+            <dt>받는 분</dt><dd>{{ order.receiver_name }}</dd>
+            <dt>연락처</dt><dd>{{ order.phone }}</dd>
+            <dt>주소</dt><dd>{{ order.full_address }}</dd>
+            {% if order.memo %}<dt>배송 메모</dt><dd>{{ order.memo }}</dd>{% endif %}
+        </dl>
+    </section>
+</div>
+{% endblock %}

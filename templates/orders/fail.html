@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block title %}결제실패 · VINTAGE SHOP{% endblock %}
+
+{% block content %}
+<div style="text-align:center; padding:64px 0;">
+    <h1 style="font-weight:500; letter-spacing:-0.01em;">결제가 완료되지 않았습니다</h1>
+    <p>{{ message }}</p>
+    {% if order and order.status == 'PENDING' %}
+        <a href="{% url 'orders:pay' order.id %}" class="btn" style="display:inline-block; width:auto; padding:14px 32px; text-decoration:none; margin-top:24px;">다시 결제하기</a>
+    {% else %}
+        <a href="{% url 'cart:detail' %}" class="btn" style="display:inline-block; width:auto; padding:14px 32px; text-decoration:none; margin-top:24px;">장바구니로</a>
+    {% endif %}
+</div>
+{% endblock %}

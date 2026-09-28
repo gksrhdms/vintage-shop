@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block title %}JOURNAL · VINTAGE SHOP{% endblock %}
+{% block main_class %}is-journal{% endblock %}
+
+{% block content %}
+<h1 class="journal-title">JOURNAL</h1>
+
+<div class="journal-list">
+    {% for post in posts %}
+        <a href="{{ post.get_absolute_url }}">
+            <div class="thumb">
+                {% with post.thumbnail as thumb %}
+                    {% if thumb %}<img src="{{ thumb.url }}" alt="{{ post.title }}">{% endif %}
+                {% endwith %}
+            </div>
+            <div class="name">{{ post.title }}</div>
+            <div class="brand">{{ post.created_at|date:"Y.m.d" }}</div>
+        </a>
+    {% empty %}
+        <p>등록된 글이 없습니다.</p>
+    {% endfor %}
+</div>
+{% endblock %}

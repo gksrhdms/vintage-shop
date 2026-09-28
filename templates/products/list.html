@@ -1,0 +1,7 @@
+{% extends 'base.html' %}
+{% block title %}{% if category %}{{ category.name }} · {% elif active_category == 'new' %}NEW · {% endif %}VINTAGE SHOP{% endblock %}
+
+{% block content %}
+{% if show_category_bar %}{% include 'products/_category_bar.html' %}{% endif %}
+{% include 'products/_grid.html' %}
+{% endblock %}

@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block title %}CART · VINTAGE SHOP{% endblock %}
+
+{% block content %}
+<h1 style="font-weight:500; letter-spacing:-0.01em;">CART</h1>
+
+<table class="cart-table">
+    <thead>
+        <tr><th>상품</th><th>가격</th><th></th></tr>
+    </thead>
+    <tbody>
+        {% for item in cart %}
+        <tr>
+            <td><a href="{{ item.product.get_absolute_url }}">{{ item.product.name }}</a></td>
+            <td>{{ item.price|floatformat:"0g" }}원</td>
+            <td>
+                <form action="{% url 'cart:remove' item.product.id %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit" style="background:none;border:none;text-decoration:underline;cursor:pointer;">삭제</button>
+                </form>
+            </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="3">장바구니가 비어있습니다.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% if cart|length > 0 %}
+<div class="cart-total">총 {{ cart.get_total_price|floatformat:"0g" }}원</div>
+<a href="{% url 'orders:create' %}" class="btn" style="display:block; text-align:center; text-decoration:none;">주문하기</a>
+{% endif %}
+{% endblock %}

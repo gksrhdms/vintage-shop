@@ -1,0 +1,74 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}VINTAGE SHOP{% endblock %}</title>
+    {# 영문 JetBrains Mono(Google Fonts) + 한글 D2Coding ligature(static/fonts에서 직접 서빙) — 둘 다 SIL OFL 1.1 #}
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap">
+    {# 거의 모든 페이지에 쓰이는 자주 쓰는 한글(Regular) 파일은 미리 받아 글자 바뀜을 줄임 #}
+    <link rel="preload" href="{% static 'fonts/d2coding-ligature-regular-ko-common.v133.woff2' %}" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="{% static 'css/fonts.css' %}">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+{% with ns=request.resolver_match.namespace url_name=request.resolver_match.url_name %}
+{# 모바일(760px 이하) 전용 상단 헤더: 로고 + 메뉴 버튼. PC에서는 숨김 #}
+<header class="mobile-header">
+    <a href="{% url 'pages:home' %}" class="mobile-logo">VINTAGE SHOP</a>
+    <button type="button" class="menu-toggle" aria-controls="site-menu" aria-expanded="false" aria-label="메뉴 열기">
+        <span class="menu-icon" aria-hidden="true"><span></span><span></span></span>
+    </button>
+</header>
+<div class="menu-backdrop" aria-hidden="true"></div>
+
+<div class="layout">
+    {# 좌측 사이드바: 로고 → 메인 메뉴 → 로그인/장바구니 (하위 메뉴 없이 바로 이동). 모바일에서는 헤더의 메뉴 버튼으로 여닫는 패널이 됨 #}
+    <aside class="sidebar" id="site-menu">
+        <a href="{% url 'pages:home' %}" class="logo">VINTAGE<br>SHOP</a>
+
+        <nav class="side-nav">
+            <a href="{% url 'products:list' %}"{% if ns == 'products' %} class="is-active"{% endif %}>shop</a>
+            <a href="{% url 'pages:journal_list' %}"{% if url_name == 'journal_list' or url_name == 'journal_detail' %} class="is-active"{% endif %}>journal</a>
+            <a href="{% url 'pages:about' %}"{% if url_name == 'about' %} class="is-active"{% endif %}>about</a>
+        </nav>
+
+        <nav class="side-nav side-nav-account">
+            {% if user.is_authenticated %}
+                {# Django 5부터 로그아웃은 POST 요청만 허용 #}
+                <form action="{% url 'accounts:logout' %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="link-button">log out</button>
+                </form>
+            {% else %}
+                <a href="{% url 'accounts:login' %}"{% if ns == 'accounts' %} class="is-active"{% endif %}>log in</a>
+            {% endif %}
+            <a href="{% url 'cart:detail' %}"{% if ns == 'cart' or ns == 'orders' %} class="is-active"{% endif %}>cart ({{ cart|length }})</a>
+            {% if user.is_authenticated %}
+                <a href="{% url 'accounts:mypage' %}"{% if url_name == 'mypage' or url_name == 'mypage_order' %} class="is-active"{% endif %}>mypage</a>
+            {% endif %}
+        </nav>
+    </aside>
+
+    <div class="content">
+        {% if messages %}
+            <ul class="messages">
+                {% for message in messages %}<li>{{ message }}</li>{% endfor %}
+            </ul>
+        {% endif %}
+
+        <main class="site-main {% block main_class %}{% endblock %}">
+            {% block content %}{% endblock %}
+        </main>
+
+        {% block footer %}{% include '_footer.html' %}{% endblock %}
+    </div>
+</div>
+{% endwith %}
+<script src="{% static 'js/menu.js' %}" defer></script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>

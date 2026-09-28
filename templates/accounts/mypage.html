@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block title %}MY PAGE · VINTAGE SHOP{% endblock %}
+
+{% block content %}
+<div class="mypage">
+    <h1>MY PAGE</h1>
+    <p class="mypage-hello">{{ user.username }}님의 주문내역</p>
+
+    {% if orders %}
+        <ul class="order-list">
+            {% for order in orders %}
+                <li class="order-row">
+                    <a href="{% url 'accounts:mypage_order' order.id %}" class="order-link">
+                        <span class="order-meta">{{ order.created_at|date:"Y.m.d" }} · 주문 #{{ order.id }}</span>
+                        <span class="order-name">{{ order.get_order_name }}</span>
+                        <span class="order-sum">{{ order.total_price|floatformat:"0g" }}원 · <span class="order-status status-{{ order.status|lower }}">{{ order.get_status_display }}</span></span>
+                    </a>
+                    {% if order.tracking_url %}
+                        <a href="{{ order.tracking_url }}" class="btn btn-outline order-track" target="_blank" rel="noopener">배송조회</a>
+                    {% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p class="mypage-empty">아직 주문내역이 없어요. <a href="{% url 'products:list' %}">shop</a>에서 상품을 둘러보세요.</p>
+    {% endif %}
+</div>
+{% endblock %}
