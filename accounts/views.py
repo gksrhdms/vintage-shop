@@ -7,7 +7,7 @@ from .forms import SignUpForm
 
 def _my_orders(user):
     # 결제대기(결제를 끝내지 않은) 주문은 주문내역에서 제외
-    return user.orders.exclude(status='PENDING').prefetch_related('items__product')
+    return user.orders.exclude(status='PENDING').prefetch_related('items__product__images')
 
 
 @login_required

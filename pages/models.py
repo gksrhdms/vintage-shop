@@ -65,3 +65,20 @@ class AboutPage(models.Model):
 
     def __str__(self):
         return self.title
+
+
+class HomeIntro(models.Model):
+    """홈 화면 상품 사진 위에 보이는 브랜드 소개글. 사이트에 하나만 존재하며 관리자에서 수정"""
+    text = models.TextField(
+        '소개글', blank=True,
+        help_text='홈 화면 상품 사진 위에 표시돼요. 줄바꿈은 그대로 보이고, 비워두면 소개글 영역이 나타나지 않아요.',
+    )
+    is_visible = models.BooleanField('표시', default=True)
+    updated_at = models.DateTimeField('수정일', auto_now=True)
+
+    class Meta:
+        verbose_name = '홈 소개글'
+        verbose_name_plural = '홈 소개글'
+
+    def __str__(self):
+        return '홈 소개글'

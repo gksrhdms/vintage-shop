@@ -13,7 +13,7 @@
                     <a href="{% url 'accounts:mypage_order' order.id %}" class="order-link">
                         <span class="order-meta">{{ order.created_at|date:"Y.m.d" }} · 주문 #{{ order.id }}</span>
                         <span class="order-name">{{ order.get_order_name }}</span>
-                        <span class="order-sum">{{ order.total_price|floatformat:"0g" }}원 · <span class="order-status status-{{ order.status|lower }}">{{ order.get_status_display }}</span></span>
+                        <span class="order-sum">{{ order.total_price|floatformat:"0g" }} · <span class="order-status status-{{ order.status|lower }}">{{ order.get_status_display }}</span></span>
                     </a>
                     {% if order.tracking_url %}
                         <a href="{{ order.tracking_url }}" class="btn btn-outline order-track" target="_blank" rel="noopener">배송조회</a>

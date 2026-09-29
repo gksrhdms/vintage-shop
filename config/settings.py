@@ -90,7 +90,8 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'cart.context_processors.cart',  # 모든 템플릿에서 장바구니 개수 사용
-                'products.context_processors.nav_categories',  # SHOP 하위메뉴(카테고리 목록)
+                'products.context_processors.nav_categories',  # 상품 목록 위 카테고리 바
+                'pages.context_processors.social_links',  # 메인 메뉴 instagram / mail 주소
             ],
         },
     },
@@ -190,5 +191,10 @@ MAILERS = {
 # 개발자센터(https://developers.tosspayments.com)에서 발급받은 내 키로 환경변수를 설정하세요.
 TOSS_CLIENT_KEY = os.environ.get('TOSS_CLIENT_KEY', 'test_gck_docs_Ovk5rk1EwkEbP0W43n07xlzm')
 TOSS_SECRET_KEY = os.environ.get('TOSS_SECRET_KEY', 'test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6')
+
+# 메인 메뉴의 instagram / mail 링크. 비어 있으면 메뉴는 보이지만 눌러도 아무 동작도 하지 않음.
+# 예) INSTAGRAM_URL=https://www.instagram.com/계정명/  CONTACT_EMAIL=hello@example.com
+INSTAGRAM_URL = os.environ.get('INSTAGRAM_URL', '').strip()
+CONTACT_EMAIL = os.environ.get('CONTACT_EMAIL', '').strip()
 
 DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'

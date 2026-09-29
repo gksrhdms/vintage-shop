@@ -1,6 +1,5 @@
-{# 상품 목록 맨 위 카테고리 바: NEW, ALL + 관리자에서 등록한 카테고리 #}
+{# 상품 목록 맨 위 카테고리 바: ALL + 관리자에서 등록한 카테고리 #}
 <nav class="category-bar" aria-label="카테고리">
-    <a href="{% url 'products:new' %}"{% if active_category == 'new' %} class="is-active" aria-current="page"{% endif %}>NEW</a>
     <a href="{% url 'products:list' %}"{% if active_category == 'all' %} class="is-active" aria-current="page"{% endif %}>ALL</a>
     {% for c in nav_categories %}
         <a href="{% url 'products:list_by_category' c.slug %}"{% if active_category == c.slug %} class="is-active" aria-current="page"{% endif %}>{{ c.name|upper }}</a>

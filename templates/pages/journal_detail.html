@@ -1,7 +1,6 @@
 {% extends 'base.html' %}
 {% block title %}{{ post.title }} · VINTAGE SHOP{% endblock %}
 {% block main_class %}is-journal is-split{% endblock %}
-{% block footer %}{% endblock %}
 
 {% block content %}
 {# 참고: mainaccessdoor.com — 왼쪽 이미지 칸은 화면 높이를 꽉 채우고, 두 칸이 스크롤바 없이 각자 스크롤됨 #}
@@ -23,7 +22,6 @@
             {# 빈 줄로 나눈 부분은 문단(<p>), 한 줄 바꿈은 <br>로 표시 #}
             <div class="journal-body">{{ post.content|linebreaks }}</div>
         {% endif %}
-        {% include '_footer.html' %}
     </div>
 </article>
 {% endblock %}

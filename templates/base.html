@@ -34,6 +34,9 @@
             <a href="{% url 'products:list' %}"{% if ns == 'products' %} class="is-active"{% endif %}>shop</a>
             <a href="{% url 'pages:journal_list' %}"{% if url_name == 'journal_list' or url_name == 'journal_detail' %} class="is-active"{% endif %}>journal</a>
             <a href="{% url 'pages:about' %}"{% if url_name == 'about' %} class="is-active"{% endif %}>about</a>
+            {# 주소가 설정되면 새 창(탭)으로 이동. 아직 비어 있으면 눌러도 아무 동작도 하지 않음 #}
+            {% if instagram_url %}<a href="{{ instagram_url }}" target="_blank" rel="noopener">instagram</a>{% else %}<a class="is-empty" aria-disabled="true">instagram</a>{% endif %}
+            {% if contact_mailto %}<a href="{{ contact_mailto }}" target="_blank" rel="noopener">mail</a>{% else %}<a class="is-empty" aria-disabled="true">mail</a>{% endif %}
         </nav>
 
         <nav class="side-nav side-nav-account">
@@ -64,7 +67,8 @@
             {% block content %}{% endblock %}
         </main>
 
-        {% block footer %}{% include '_footer.html' %}{% endblock %}
+        {# 푸터(회사소개·저작권)는 홈 화면에서만 표시 #}
+        {% if ns == 'pages' and url_name == 'home' %}{% include '_footer.html' %}{% endif %}
     </div>
 </div>
 {% endwith %}

@@ -92,6 +92,10 @@ h1 {
     text-decoration-thickness: 1px;
 }
 
+/* 주소가 아직 없는 메뉴(instagram/mail): 보이기만 하고 눌러도 반응 없음 */
+.side-nav .is-empty,
+.side-nav .is-empty:hover { color: inherit; cursor: default; }
+
 /* 로그아웃처럼 폼 버튼이지만 링크처럼 보여야 하는 요소 */
 .side-nav form { margin: 0; }
 .link-button {
@@ -153,6 +157,16 @@ h1 {
     gap: 56px 40px;
 }
 
+/* 홈: 상품 사진 위 브랜드 소개글 (줄바꿈 그대로) */
+.home-intro {
+    max-width: 560px;
+    margin: 0 0 40px;
+    font-size: 14px;
+    line-height: 1.7;
+    white-space: pre-line;
+    word-break: keep-all;
+}
+
 /* 홈: 글씨 없이 사진만 → 사진 사이 간격을 좁게 */
 .product-grid.is-images-only { gap: 32px; }
 .product-grid.is-images-only .thumb { margin-bottom: 0; }
@@ -161,6 +175,7 @@ h1 {
 .product-card:hover { color: inherit; }
 
 .product-card .thumb {
+    position: relative;
     aspect-ratio: 3 / 4;
     background: #f2f2f2;
     overflow: hidden;
@@ -168,13 +183,30 @@ h1 {
 }
 
 .product-card img {
+    display: block;
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: opacity 0.2s ease;
+    transition: opacity 0.25s ease;
 }
 
-.product-card:hover img { opacity: 0.85; }
+/* 두 번째 이미지는 대표 이미지 위에 겹쳐 두고 숨겨둠 → 마우스를 올리면 나타나고, 치우면 다시 사라짐 */
+.product-card .thumb-alt {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+}
+
+@media (hover: hover) {
+    .product-card:hover .thumb-alt,
+    .product-card:focus-visible .thumb-alt { opacity: 1; }
+    /* 두 번째 이미지가 없는 상품은 살짝 흐려지는 기존 효과 유지 */
+    .product-card:hover .thumb:not(.has-alt) img { opacity: 0.85; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .product-card img { transition: none; }
+}
 
 /* 캡션: 브랜드 / 상품명 / 가격을 가운데 정렬로 쌓음 */
 .product-card .caption {
@@ -389,7 +421,16 @@ a.btn.btn-outline:hover { color: var(--black); background: #f7f7f7; }
 .mypage-dl dt { color: var(--gray); }
 .mypage-dl dd { margin: 0; overflow-wrap: anywhere; }
 .mypage-items { list-style: none; margin: 0; padding: 0; font-size: 13px; }
-.mypage-items li { display: flex; justify-content: space-between; gap: 12px; padding: 4px 0; }
+.mypage-items li { display: flex; align-items: center; gap: 14px; padding: 8px 0; }
+.mypage-item-thumb {
+    flex: 0 0 56px;
+    aspect-ratio: 3 / 4;   /* 상품 카드와 같은 비율의 작은 사진 */
+    background: #f2f2f2;
+    overflow: hidden;
+}
+.mypage-item-thumb img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.mypage-item-name { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.mypage-item-price { white-space: nowrap; }
 
 /* ---------- Journal / About ---------- */
 .journal-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 48px 40px; }
@@ -414,7 +455,7 @@ a.btn.btn-outline:hover { color: var(--black); background: #f7f7f7; }
 
 /* ---------- About / Journal 상세: 이미지는 왼쪽, 글은 오른쪽 (참고: mainaccessdoor.com)
    PC: 두 칸이 화면 높이를 꽉 채우고, 스크롤바 없이 각자 스크롤됨(박스처럼 보이지 않게).
-   페이지 자체는 스크롤되지 않고, 푸터는 글 칸 맨 끝에 들어감 ---------- */
+   페이지 자체는 스크롤되지 않음 ---------- */
 .site-main.is-split { max-width: none; padding: 0; }
 .split {
     display: grid;
@@ -433,13 +474,17 @@ a.btn.btn-outline:hover { color: var(--black); background: #f7f7f7; }
 .split-col::-webkit-scrollbar { display: none; }  /* 스크롤바 숨김 (Chrome/Safari) */
 .split-col:focus-visible { box-shadow: inset 0 0 0 1px var(--line); }
 .split-media-col { display: flex; flex-direction: column; gap: 12px; padding-block: 32px; }
-.split-text-col { display: flex; flex-direction: column; max-width: 520px; padding: 32px 48px 0 0; }
+.split-text-col { display: flex; flex-direction: column; max-width: 520px; padding: 32px 48px 32px 0; }
+
+/* About: 좌우 반전 — 글은 왼쪽(사이드바 옆), 이미지는 오른쪽(화면 오른쪽 끝까지) */
+.split-reverse { grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr); }
+.split-reverse .split-text-col { grid-column: 1; grid-row: 1; padding: 32px 0; }
+.split-reverse .split-media-col { grid-column: 2; grid-row: 1; }
 .split-media { margin: 0; }
 .split-media img { display: block; width: 100%; height: auto; }
 .split-head h1 { margin: 0 0 8px; }
 .split-head .brand { margin: 0 0 28px; }
 .about-body { white-space: pre-line; }
-.split-text-col .site-footer { margin-top: auto; padding: 64px 0 32px; }
 
 /* ---------- Journal 페이지 전용 (목록/상세) ----------
    본문은 About과 같은 Regular·14px, 글 제목만 한글 D2Coding Bold(영문 JetBrains Mono 굵기는 그대로).
@@ -512,7 +557,7 @@ a.btn.btn-outline:hover { color: var(--black); background: #f7f7f7; }
 
 /* 좁은 화면(1000px 이하): 따로 스크롤 없이 페이지 하나로 이어짐.
    두 칸을 풀어(display: contents) 각 요소의 order 값대로 제목 → 이미지 → 글(블록 순서) 배치 */
-/* 좁은 화면(1000px 이하): 두 칸 스크롤 없이 페이지 하나로 이어짐. 제목 → 글 → 이미지 → 푸터 순서 */
+/* 좁은 화면(1000px 이하): 두 칸 스크롤 없이 페이지 하나로 이어짐. 제목 → 글 → 이미지 순서 */
 @media (max-width: 1000px) {
     .site-main.is-split { padding: 40px 48px 0; }
     .split { display: flex; flex-direction: column; gap: 20px; height: auto; }
@@ -521,7 +566,6 @@ a.btn.btn-outline:hover { color: var(--black); background: #f7f7f7; }
     .split-head .brand { margin-bottom: 0; }
     .journal-body, .about-body { order: -2; margin-bottom: 16px; }
     .split > .split-col > * { max-width: 640px; width: 100%; }
-    .split-text-col .site-footer { order: 10; margin-top: 40px; padding: 24px 0; }
 }
 
 /* 모바일/태블릿(760px 이하): 상단 고정 헤더 + 메뉴 버튼으로 여닫는 메뉴 패널 */
@@ -596,9 +640,11 @@ a.btn.btn-outline:hover { color: var(--black); background: #f7f7f7; }
     .menu-open .sidebar .side-nav:not(.side-nav-account) > :nth-child(1) { transition-delay: 0.04s; }
     .menu-open .sidebar .side-nav:not(.side-nav-account) > :nth-child(2) { transition-delay: 0.07s; }
     .menu-open .sidebar .side-nav:not(.side-nav-account) > :nth-child(3) { transition-delay: 0.10s; }
-    .menu-open .sidebar .side-nav-account > :nth-child(1) { transition-delay: 0.13s; }
-    .menu-open .sidebar .side-nav-account > :nth-child(2) { transition-delay: 0.16s; }
-    .menu-open .sidebar .side-nav-account > :nth-child(3) { transition-delay: 0.19s; }
+    .menu-open .sidebar .side-nav:not(.side-nav-account) > :nth-child(4) { transition-delay: 0.13s; }
+    .menu-open .sidebar .side-nav:not(.side-nav-account) > :nth-child(5) { transition-delay: 0.16s; }
+    .menu-open .sidebar .side-nav-account > :nth-child(1) { transition-delay: 0.19s; }
+    .menu-open .sidebar .side-nav-account > :nth-child(2) { transition-delay: 0.22s; }
+    .menu-open .sidebar .side-nav-account > :nth-child(3) { transition-delay: 0.25s; }
 
     /* 메뉴 바깥 영역: 누르면 닫힘 */
     .menu-backdrop {

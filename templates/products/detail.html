@@ -7,7 +7,7 @@
     <div class="work-text">
         <div class="brand">{{ product.brand|upper }}</div>
         <h1>{{ product.name }}</h1>
-        <div class="price">{{ product.price|floatformat:"0g" }}원</div>
+        <div class="price">{{ product.price|floatformat:"0g" }}</div>
 
         <dl>
             <dt>사이즈</dt><dd>{{ product.size|default:"-" }}</dd>

@@ -3,7 +3,7 @@ from django.contrib import admin
 from django.db.models import Max
 from django.shortcuts import redirect
 from django.utils.html import format_html
-from .models import AboutPage, JournalImage, JournalPost
+from .models import AboutPage, HomeIntro, JournalImage, JournalPost
 
 
 class MultipleFileInput(forms.ClearableFileInput):
@@ -83,18 +83,30 @@ class JournalPostAdmin(admin.ModelAdmin):
             JournalImage.objects.create(post=form.instance, image=upload, order=self._next_order(form.instance))
 
 
-@admin.register(AboutPage)
-class AboutPageAdmin(admin.ModelAdmin):
-    """About 페이지는 하나뿐이라 목록 대신 바로 수정 화면으로 이동하고, 추가/삭제는 막음"""
+class SingletonAdmin(admin.ModelAdmin):
+    """사이트에 하나만 있는 항목: 목록 대신 바로 수정 화면으로 이동하고, 추가/삭제는 막음"""
 
     def has_add_permission(self, request):
-        return not AboutPage.objects.exists()
+        return not self.model.objects.exists()
 
     def has_delete_permission(self, request, obj=None):
         return False
 
     def changelist_view(self, request, extra_context=None):
-        page = AboutPage.objects.first()
-        if page:
-            return redirect('admin:pages_aboutpage_change', page.pk)
-        return redirect('admin:pages_aboutpage_add')
+        opts = self.model._meta
+        obj = self.model.objects.first()
+        if obj:
+            return redirect(f'admin:{opts.app_label}_{opts.model_name}_change', obj.pk)
+        return redirect(f'admin:{opts.app_label}_{opts.model_name}_add')
+
+
+@admin.register(AboutPage)
+class AboutPageAdmin(SingletonAdmin):
+    pass
+
+
+@admin.register(HomeIntro)
+class HomeIntroAdmin(SingletonAdmin):
+    formfield_overrides = {
+        HomeIntro._meta.get_field('text').__class__: {'widget': forms.Textarea(attrs={'rows': 6, 'cols': 80})},
+    }

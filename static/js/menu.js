@@ -38,7 +38,7 @@
         root.classList.add('menu-open');  // CSS에서 패널 표시
         toggle.setAttribute('aria-expanded', 'true');
         toggle.setAttribute('aria-label', '메뉴 닫기');
-        var first = menu.querySelector('.side-nav a, .side-nav button');
+        var first = menu.querySelector('.side-nav a[href], .side-nav button');
         if (first) first.focus({ preventScroll: true });
     }
 
@@ -64,9 +64,9 @@
         backdrop.addEventListener('click', function () { close(false); });
     }
 
-    // 메뉴 항목(링크, 로그아웃 버튼)을 누르면 닫고 이동
+    // 메뉴 항목(링크, 로그아웃 버튼)을 누르면 닫고 이동. 주소가 없는 메뉴(aria-disabled)는 아무 동작도 하지 않음
     menu.addEventListener('click', function (e) {
-        if (isOpen() && e.target.closest('a, button')) close(false);
+        if (isOpen() && e.target.closest('a[href], button')) close(false);
     });
 
     document.addEventListener('keydown', function (e) {

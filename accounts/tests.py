@@ -64,6 +64,25 @@ class MypageTests(TestCase):
         self.assertContains(res, 'CJ대한통운')
         self.assertContains(self.client.get(reverse('accounts:mypage')), '배송조회')
 
+    def test_order_detail_shows_small_product_photo(self):
+        from io import BytesIO
+        from django.core.files.base import ContentFile
+        from PIL import Image
+        from products.models import ProductImage
+        order = make_order(self.user)
+        product = order.items.first().product
+        buf = BytesIO()
+        Image.new('RGB', (30, 40), '#777').save(buf, 'JPEG')
+        img = ProductImage.objects.create(product=product, order=0, image=ContentFile(buf.getvalue(), name='thumb.jpg'))
+        try:
+            self.client.force_login(self.user)
+            res = self.client.get(reverse('accounts:mypage_order', args=[order.id]))
+            self.assertContains(res, 'class="mypage-item-thumb"')
+            self.assertContains(res, img.image.url)
+            self.assertContains(res, product.name)
+        finally:
+            img.image.delete(save=False)
+
     def test_etc_courier_shows_number_without_link(self):
         order = make_order(self.user, status='SHIPPED', courier='etc', tracking_number='A-1')
         self.client.force_login(self.user)

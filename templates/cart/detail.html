@@ -12,7 +12,7 @@
         {% for item in cart %}
         <tr>
             <td><a href="{{ item.product.get_absolute_url }}">{{ item.product.name }}</a></td>
-            <td>{{ item.price|floatformat:"0g" }}원</td>
+            <td>{{ item.price|floatformat:"0g" }}</td>
             <td>
                 <form action="{% url 'cart:remove' item.product.id %}" method="post">
                     {% csrf_token %}
@@ -27,7 +27,7 @@
 </table>
 
 {% if cart|length > 0 %}
-<div class="cart-total">총 {{ cart.get_total_price|floatformat:"0g" }}원</div>
+<div class="cart-total">총 {{ cart.get_total_price|floatformat:"0g" }}</div>
 <a href="{% url 'orders:create' %}" class="btn" style="display:block; text-align:center; text-decoration:none;">주문하기</a>
 {% endif %}
 {% endblock %}

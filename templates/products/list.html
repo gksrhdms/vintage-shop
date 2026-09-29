@@ -1,7 +1,9 @@
 {% extends 'base.html' %}
-{% block title %}{% if category %}{{ category.name }} · {% elif active_category == 'new' %}NEW · {% endif %}VINTAGE SHOP{% endblock %}
+{% block title %}{% if category %}{{ category.name }} · {% endif %}VINTAGE SHOP{% endblock %}
 
 {% block content %}
+{# 홈 첫 페이지: 상품 사진 위 브랜드 소개글 (관리자 > 홈 소개글에서 수정) #}
+{% if home_intro and page_obj.number == 1 %}<p class="home-intro">{{ home_intro.text }}</p>{% endif %}
 {% if show_category_bar %}{% include 'products/_category_bar.html' %}{% endif %}
 {% include 'products/_grid.html' %}
 {% endblock %}

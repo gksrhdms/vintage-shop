@@ -30,8 +30,19 @@
         <ul class="mypage-items">
             {% for item in order.items.all %}
                 <li>
-                    {% if item.product %}<a href="{{ item.product.get_absolute_url }}">{{ item.product.name }}</a>{% else %}(삭제된 상품){% endif %}
-                    <span>{{ item.price|floatformat:"0g" }}원</span>
+                    {# 상품 대표(첫 번째) 사진을 작게 함께 표시. 사진이 없거나 삭제된 상품은 빈 칸 #}
+                    {% with img=item.product.images.all.0 %}
+                        {% if item.product %}
+                            <a href="{{ item.product.get_absolute_url }}" class="mypage-item-thumb" tabindex="-1" aria-hidden="true">
+                                {% if img %}<img src="{{ img.image.url }}" alt="" loading="lazy">{% endif %}
+                            </a>
+                            <a href="{{ item.product.get_absolute_url }}" class="mypage-item-name">{{ item.product.name }}</a>
+                        {% else %}
+                            <span class="mypage-item-thumb"></span>
+                            <span class="mypage-item-name">(삭제된 상품)</span>
+                        {% endif %}
+                    {% endwith %}
+                    <span class="mypage-item-price">{{ item.price|floatformat:"0g" }}</span>
                 </li>
             {% endfor %}
         </ul>
@@ -41,7 +52,7 @@
         <h2>결제 정보</h2>
         <dl class="mypage-dl">
             <dt>주문일</dt><dd>{{ order.created_at|date:"Y.m.d H:i" }}</dd>
-            <dt>결제금액</dt><dd>{{ order.total_price|floatformat:"0g" }}원</dd>
+            <dt>결제금액</dt><dd>{{ order.total_price|floatformat:"0g" }}</dd>
             <dt>결제수단</dt><dd>{{ order.payment_method|default:"-" }}</dd>
             <dt>결제일시</dt><dd>{{ order.paid_at|date:"Y.m.d H:i"|default:"-" }}</dd>
         </dl>

@@ -36,7 +36,7 @@
             {% endif %}
         {% endfor %}
 
-        <p><strong>총 결제금액: {{ cart.get_total_price|floatformat:"0g" }}원</strong></p>
+        <p><strong>총 결제금액: {{ cart.get_total_price|floatformat:"0g" }}</strong></p>
         <button type="submit" class="btn">결제하기</button>
     </form>
 </div>
