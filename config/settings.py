@@ -32,11 +32,11 @@ SECRET_KEY = os.environ.get(
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'healthcheck.railway.app']  # 마지막은 Railway 헬스체크용
+ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 CSRF_TRUSTED_ORIGINS = []
 
-# Railway가 자동으로 넣어주는 공개 도메인 + 직접 연결한 도메인(쉼표 구분)
-_hosts = [os.environ.get('RAILWAY_PUBLIC_DOMAIN', '')] + os.environ.get('ALLOWED_HOSTS', '').split(',')
+# Render가 자동으로 넣어주는 공개 도메인 + 직접 연결한 도메인(쉼표 구분)
+_hosts = [os.environ.get('RENDER_EXTERNAL_HOSTNAME', '')] + os.environ.get('ALLOWED_HOSTS', '').split(',')
 for _host in filter(None, (h.strip() for h in _hosts)):
     ALLOWED_HOSTS.append(_host)
     CSRF_TRUSTED_ORIGINS.append(f'https://{_host}')
@@ -108,6 +108,8 @@ DATABASES = {
     'default': dj_database_url.config(
         default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
         conn_max_age=600,
+        # Neon 무료 DB는 5분간 요청이 없으면 잠들어 연결이 끊김 → 재사용 전에 연결 상태 확인
+        conn_health_checks=True,
     )
 }
 
@@ -167,9 +169,12 @@ def _long_cache_for_fonts(headers, path, url):
 WHITENOISE_ADD_HEADERS_FUNCTION = _long_cache_for_fonts
 
 # 상품 사진 등 사용자가 업로드하는 파일 (Media files)
-# 배포 시에는 MEDIA_ROOT를 영구 볼륨 경로(예: /data/media)로 지정해야 재배포해도 사진이 남아요.
+# 로컬: media/ 폴더. 배포: CLOUDINARY_URL이 있으면 Cloudinary에 저장(Render 서버는 재시작 시 파일이 지워짐).
 MEDIA_URL = 'media/'
 MEDIA_ROOT = Path(os.environ.get('MEDIA_ROOT', BASE_DIR / 'media'))
+USE_CLOUDINARY = bool(os.environ.get('CLOUDINARY_URL'))  # cloudinary SDK가 이 변수를 직접 읽음
+if USE_CLOUDINARY:
+    STORAGES['default'] = {'BACKEND': 'config.storage.CloudinaryMediaStorage'}
 
 LOGIN_URL = 'accounts:login'
 LOGIN_REDIRECT_URL = 'products:list'
