@@ -4,7 +4,8 @@
 각 항목: **증상 → 원인 → 해결 → 관련 파일**
 
 ## 목차
-- [배포 (Railway)](#배포-railway)
+- [배포 이전 (Railway → Render)](#배포-이전-railway--render)
+- [배포 (Railway, 이전 기록)](#배포-railway-이전-기록)
 - [Django](#django)
 - [마이그레이션 · 데이터](#마이그레이션--데이터)
 - [화면 · CSS · JS](#화면--css--js)
@@ -13,7 +14,9 @@
 
 ---
 
-## 배포 (Railway)
+## 배포 (Railway, 이전 기록)
+
+> 2026-11 Railway 체험판 만료로 Render로 옮겼습니다(31번~). 아래 1~6번은 Railway를 쓰던 때의 기록입니다.
 
 ### 1. Vercel 대신 Railway를 쓴 이유
 - **증상**: 처음엔 Vercel 배포를 검토. Vercel은 서버리스라 요청마다 파일시스템이 초기화됨.
@@ -199,3 +202,67 @@
 ### 30. 로컬 확인용 DB를 따로 쓰기
 - 원래 개발 DB를 건드리지 않고 확인하려면 `DATABASE_URL=sqlite:///다른경로.sqlite3`, `MEDIA_ROOT=다른경로`를
   지정해 `migrate` 후 샘플 데이터를 넣어 테스트.
+
+---
+
+## 배포 이전 (Railway → Render)
+
+### 31. Railway 체험판 만료 → 무료 구성으로 이전
+- **증상**: 사이트 접속 시 Railway 기본 404(JSON). `railway status`에서 web `Failed`, Postgres `Offline`, 대시보드 상단 "trial ended".
+- **원인**: 체험판 크레딧 만료. 결제 전에는 서비스를 다시 켤 수 없어 DB(`pg_dump`/`dumpdata`)와 볼륨 사진도 꺼낼 수 없음.
+- **해결**: 운영 데이터는 테스트 수준이라 백업 없이 새로 시작. 무료로 같은 역할을 나눠 맡김
+  - 앱: **Render** 무료 Web Service (일반 서버라 gunicorn·WhiteNoise 구조 그대로)
+  - DB: **Neon** 무료 PostgreSQL (만료 없음. Render 무료 DB는 30일 후 만료라 제외). 코드는 이미 `DATABASE_URL`을 읽어서 주소만 교체
+  - 사진: **Cloudinary** 무료 (Render 무료 서버는 디스크가 재시작 시 지워짐)
+  - Vercel은 서버리스라 파일 저장·상시 실행이 안 돼 제외(1번 항목과 같은 이유)
+- **교훈**: 데이터를 지키려면 체험판 만료 **전에** 백업해야 함. 멈춘 뒤에는 결제 없이는 못 꺼냄.
+
+### 32. `django-cloudinary-storage` 대신 저장소를 직접 구현
+- **원인**: 이 패키지는 2020-08(0.3.0) 이후 릴리스가 없고, Django 5.1에서 없어진 `DEFAULT_FILE_STORAGE` 방식 기반이라 Django 5.2와 충돌 위험.
+- **해결**: 공식 SDK `cloudinary` + Django `Storage`를 상속한 클래스(`_save` · `exists` · `url` · `delete`).
+  `CLOUDINARY_URL`이 있을 때만 `STORAGES['default']`로 사용. DB에는 기존과 같은 경로(`products/2026/11/a.jpg`),
+  Cloudinary `public_id`는 확장자를 뺀 경로. 사진 주소에 `f_auto,q_auto`를 붙여 WebP/AVIF로 자동 변환.
+- **제외한 대안**: Cloudflare R2, Backblaze B2 — 무료여도 카드 등록이 필요한지 자료마다 달라서.
+- **파일**: `config/storage.py`, `config/settings.py`, `config/tests.py`
+
+### 33. 같은 이름 사진을 올리면 Windows에서 경로에 `\`가 섞임
+- **증상**: 테스트 `test_existing_name_gets_new_name` 실패. 반환된 이름이 `about\a_GHGgIZh.jpg`.
+- **원인**: 이름이 겹치면 Django가 `os.path.join`으로 새 이름을 만듦 → Windows에서는 `\`. 기본 `FileSystemStorage`는
+  `/`로 바꿔 돌려주지만 직접 만든 `_save`는 그대로 돌려줌 → DB에 `\` 경로가 저장될 수 있음.
+- **해결**: `_save`에서 `name.replace('\\', '/')` 반환.
+- **파일**: `config/storage.py`
+
+### 34. Cloudinary Media Library에 폴더 없이 사진만 보임
+- **원인**: 새 Cloudinary 계정은 "동적 폴더" 방식이라 `public_id`(주소)와 `asset_folder`(화면 폴더)를 따로 관리.
+  `public_id`에 `products/...`가 있어도 화면에서는 Home에 보임. 사진 주소는 정상.
+- **해결**: 업로드할 때 `asset_folder=posixpath.dirname(public_id)`도 전달. 이미 올린 사진은 화면에서 옮겨도 주소는 그대로.
+
+### 35. neon.tech 접속 시 "응답하는 데 시간이 너무 오래 걸립니다"
+- **원인**: `neon.tech` → `neon.com`(홍보 사이트)으로 넘어가는데 이 네트워크에서 `neon.com`만 타임아웃. 콘솔은 정상.
+- **해결**: 콘솔로 바로 접속 https://console.neon.tech (가입: `/signup`). 상태 확인: https://neonstatus.com
+
+### 36. 환경변수 설정 시 `The filename, directory name, or volume label syntax is incorrect.`
+- **원인**: cmd 창에서 PowerShell 문법(`$env:DATABASE_URL="..."`)을 입력. 이 오류 문구는 cmd에서만 나옴.
+- **해결**: 프롬프트로 셸 확인(`PS C:\...>` = PowerShell, `C:\...>` = cmd).
+  - PowerShell: `$env:DATABASE_URL="주소"`
+  - cmd: `set "DATABASE_URL=주소"` — Neon 주소의 `&`(`...sslmode=require&channel_binding=require`) 때문에 **따옴표를 전체에** 씌워야 함
+  - 값 확인(비밀번호 노출 없이): cmd `echo %DATABASE_URL:~0,13%` → `postgresql://`
+- 환경변수는 설정한 창에서만 유지됨.
+
+### 37. 운영 환경변수를 켜 둔 창에서 테스트를 돌리지 않기
+- **원인**: `CLOUDINARY_URL`이 있으면 테스트도 Cloudinary 저장소를 써서 진짜로 사진이 올라가고,
+  `DATABASE_URL`이 Neon이면 테스트 DB도 Neon에 만들어짐.
+- **해결**: `manage.py test`는 환경변수를 설정하지 않은 **새 창**에서 실행.
+
+### 38. Render에서 결제하기 버튼이 비활성화된 채 결제창이 안 뜸
+- **증상**: 결제 페이지에 상품명·금액·버튼만 보이고 결제수단/약관 칸이 없음. 콘솔:
+  `Uncaught (in promise) Error: test_gck, live_gck로 시작하는 주문서형, 결제창형 연동 키의 클라이언트 키로 SDK를 연동해주세요. API 개별 연동 키는 지원하지 않습니다`
+- **원인**: Render에 `TOSS_CLIENT_KEY` 이름만 만들고 값을 비워 둠 → `os.environ.get(이름, 기본값)`은 변수가 **있으면** 빈 문자열도
+  그대로 반환 → 기본 테스트 키 대신 `''`가 위젯에 전달됨. 위젯이 그려진 뒤에만 버튼을 켜는 구조라 버튼도 계속 비활성화.
+- **해결**: `os.environ.get(이름, '').strip() or 기본값`으로 빈 값도 기본값 처리. 위젯 로딩 실패 시 화면에 오류 문구 표시.
+- **교훈**: 환경변수는 "없음"과 "빈 값"이 다름. 쓰지 않을 변수는 대시보드에서 아예 지우기.
+- **파일**: `config/settings.py`, `templates/orders/pay.html`
+
+### 39. Python 버전 맞추기
+- Render는 `PYTHON_VERSION` 환경변수 → 저장소의 `.python-version` 순서로 버전을 정함. 로컬 테스트 버전(3.14)과 맞추려고
+  `.python-version`을 `3.13` → `3.14`로 변경.

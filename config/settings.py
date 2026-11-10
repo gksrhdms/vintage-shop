@@ -194,8 +194,11 @@ MAILERS = {
 # 토스페이먼츠 결제 키
 # 기본값은 토스페이먼츠 공식 문서의 공개 테스트 키입니다(실제 돈이 나가지 않음).
 # 개발자센터(https://developers.tosspayments.com)에서 발급받은 내 키로 환경변수를 설정하세요.
-TOSS_CLIENT_KEY = os.environ.get('TOSS_CLIENT_KEY', 'test_gck_docs_Ovk5rk1EwkEbP0W43n07xlzm')
-TOSS_SECRET_KEY = os.environ.get('TOSS_SECRET_KEY', 'test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6')
+# 대시보드에 이름만 만들고 값을 비워 둔 경우('')도 기본 테스트 키를 쓰도록 `or` 사용
+# (os.environ.get의 기본값은 변수가 아예 없을 때만 적용됨 → 빈 키가 결제위젯에 전달돼 결제창이 안 뜸)
+# 붙여 넣을 때 섞이기 쉬운 앞뒤 공백·줄바꿈도 제거
+TOSS_CLIENT_KEY = os.environ.get('TOSS_CLIENT_KEY', '').strip() or 'test_gck_docs_Ovk5rk1EwkEbP0W43n07xlzm'
+TOSS_SECRET_KEY = os.environ.get('TOSS_SECRET_KEY', '').strip() or 'test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6'
 
 # 메인 메뉴의 instagram / mail 링크. 비어 있으면 메뉴는 보이지만 눌러도 아무 동작도 하지 않음.
 # 예) INSTAGRAM_URL=https://www.instagram.com/계정명/  CONTACT_EMAIL=hello@example.com

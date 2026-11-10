@@ -13,6 +13,7 @@
     <div id="agreement"></div>
 
     <button type="button" id="payment-button" class="btn" disabled>결제하기</button>
+    <p id="payment-error" role="alert" hidden></p>
 </div>
 
 {{ toss|json_script:"toss-data" }}
@@ -21,26 +22,43 @@
 (async function () {
     const data = JSON.parse(document.getElementById('toss-data').textContent);
     const button = document.getElementById('payment-button');
+    const errorBox = document.getElementById('payment-error');
+    function showError(error) {
+        // 결제위젯을 못 그리면 버튼이 계속 비활성화되므로, 이유를 화면과 콘솔에 남김
+        console.error('[결제위젯 오류]', error);
+        errorBox.textContent = '결제창을 불러오지 못했어요. (' + (error && (error.code || error.message) || error) + ')';
+        errorBox.hidden = false;
+    }
 
-    const tossPayments = TossPayments(data.clientKey);
-    const widgets = tossPayments.widgets({ customerKey: TossPayments.ANONYMOUS });
+    let widgets;
+    try {
+        const tossPayments = TossPayments(data.clientKey);
+        widgets = tossPayments.widgets({ customerKey: TossPayments.ANONYMOUS });
 
-    await widgets.setAmount({ currency: 'KRW', value: data.amount });
-    await Promise.all([
-        widgets.renderPaymentMethods({ selector: '#payment-method', variantKey: 'DEFAULT' }),
-        widgets.renderAgreement({ selector: '#agreement', variantKey: 'AGREEMENT' }),
-    ]);
+        await widgets.setAmount({ currency: 'KRW', value: data.amount });
+        await Promise.all([
+            widgets.renderPaymentMethods({ selector: '#payment-method', variantKey: 'DEFAULT' }),
+            widgets.renderAgreement({ selector: '#agreement', variantKey: 'AGREEMENT' }),
+        ]);
+    } catch (error) {
+        showError(error);
+        return;
+    }
     button.disabled = false;
 
     button.addEventListener('click', async function () {
         // 결제 인증이 끝나면 successUrl로 이동하고, 서버(payment_success)에서 최종 승인합니다.
-        await widgets.requestPayment({
-            orderId: data.orderId,
-            orderName: data.orderName,
-            customerName: data.customerName,
-            successUrl: data.successUrl,
-            failUrl: data.failUrl,
-        });
+        try {
+            await widgets.requestPayment({
+                orderId: data.orderId,
+                orderName: data.orderName,
+                customerName: data.customerName,
+                successUrl: data.successUrl,
+                failUrl: data.failUrl,
+            });
+        } catch (error) {
+            showError(error);  // 예: 약관 미동의, 결제수단 미선택
+        }
     });
 })();
 </script>
